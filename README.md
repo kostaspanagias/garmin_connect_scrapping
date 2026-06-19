@@ -1,6 +1,6 @@
 # Garmin Connect Browser Console Scrapers
 
-A collection of lightweight JavaScript snippets to run directly inside your browser's Developer Tools Console (`Inspect > Console`) on Garmin Connect. These scripts extract your health and workout data using precise absolute XPaths and automatically trigger a download of a structured `.csv` or `.md` file to your computer.
+A collection of lightweight JavaScript snippets to run directly inside your browser's Developer Tools Console (`Inspect > Console`) on Garmin Connect. These scripts extract your health and workout data using precise absolute XPaths and automatically trigger a download of a structured `.csv` file to your computer.
 
 No browser extensions or API keys required. Just copy, paste, and run.
 
