@@ -12,7 +12,8 @@ No browser extensions or API keys required. Just copy, paste, and run.
 3. [Blood Pressure Table Scraper (CSV Export)](#3-blood-pressure-table-scraper-csv-export)
 4. [Daily Steps Scraper (CSV Export)](#4-daily-steps-scraper-csv-export)
 5. [Daily Heart Rate Summary Scraper (CSV Export)](#5-daily-heart-rate-summary-scraper-csv-export)
-6. [How to Use](#-how-to-use)
+6. [Daily Nutrition Scraper (CSV Export)](#6-daily-nutrution-scraper-csv-export)
+7. [How to Use](#-how-to-use)
 
 ---
 
@@ -379,6 +380,70 @@ Scrapes daily summary analytics context, pulling 7-day trailing average resting 
         console.log(`✅ Success! Heart rate metrics saved as: ${filename}`);
     } else {
         console.log("⚠️ Automatic download failed. Raw CSV data below:\n\n", csvContent);
+    }
+})();
+```
+
+
+## 6. Daily Nutrition Scraper (CSV Export)
+Scrapes daily calories, proteins, fat and carbs intake
+```javascript
+(() => {
+    // Helper function to evaluate XPath and extract text safely
+    const getTextByXPath = (xpath) => {
+        const result = document.evaluate(
+            xpath, 
+            document, 
+            null, 
+            XPathResult.FIRST_ORDERED_NODE_TYPE, 
+            null
+        ).singleNodeValue;
+        
+        // Clean text: strip out newlines, extra spaces, or quotes
+        return result ? result.innerText.trim().replace(/\s+/g, ' ').replace(/"/g, '""') : 'N/A';
+    };
+
+    // 1. Scraping all nutrition fields based on your exact XPaths
+    const nutritionData = {
+        date: getTextByXPath("/html/body/div[1]/div[2]/div[2]/div/div[3]/div/div[2]/div/div/div[4]/div/span/div/span[2]"),
+        calories: getTextByXPath("/html/body/div[1]/div[2]/div[2]/div/div[3]/div/div[3]/div/div/div/div[1]/div/div/div[2]/div[2]"),
+        protein: getTextByXPath("/html/body/div[1]/div[2]/div[2]/div/div[3]/div/div[3]/div/div/div/div[1]/div/div/div[2]/div[4]"),
+        fat: getTextByXPath("/html/body/div[1]/div[2]/div[2]/div/div[3]/div/div[3]/div/div/div/div[1]/div/div/div[2]/div[6]"),
+        carbs: getTextByXPath("/html/body/div[1]/div[2]/div[2]/div/div[3]/div/div[3]/div/div/div/div[1]/div/div/div[2]/div[8]")
+    };
+
+    // 2. Define CSV headers and format the row data
+    const headers = ["Date", "Calories (Consumed / Target)", "Protein (Consumed / Target)", "Fat (Consumed / Target)", "Carbs (Consumed / Target)"];
+    const rowValues = [
+        `"${nutritionData.date}"`, 
+        `"${nutritionData.calories}"`, 
+        `"${nutritionData.protein}"`, 
+        `"${nutritionData.fat}"`, 
+        `"${nutritionData.carbs}"`
+    ];
+
+    // Combine into final CSV string
+    const csvContent = headers.join(",") + "\n" + rowValues.join(",");
+
+    // 3. Generate a clean filename using the target date
+    const cleanDate = nutritionData.date !== 'N/A' ? nutritionData.date.replace(/[^a-z0-9]/gi, '_').toLowerCase() : 'garmin';
+    const filename = `garmin_nutrition_${cleanDate}.csv`;
+
+    // 4. Create Blob and trigger browser download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        console.log(`✅ Success! Nutrition data saved as: ${filename}`);
+    } else {
+        console.log("⚠️ Automatic download failed. Raw CSV payload below:\n\n", csvContent);
     }
 })();
 ```
