@@ -12,7 +12,7 @@ No browser extensions or API keys required. Just copy, paste, and run.
 3. [Blood Pressure Table Scraper (CSV Export)](#3-blood-pressure-table-scraper-csv-export)
 4. [Daily Steps Scraper (CSV Export)](#4-daily-steps-scraper-csv-export)
 5. [Daily Heart Rate Summary Scraper (CSV Export)](#5-daily-heart-rate-summary-scraper-csv-export)
-6. [Daily Nutrition Scraper (CSV Export)](#6-daily-nutrution-scraper-csv-export)
+6. [Daily Nutrition Scraper (CSV Export)](#6-daily-nutrition-scraper-csv-export)
 7. [How to Use](#-how-to-use)
 
 ---
