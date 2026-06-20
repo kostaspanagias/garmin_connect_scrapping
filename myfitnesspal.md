@@ -16,10 +16,13 @@ Instead of manually copying individual macro values or paying for premium export
     // Grab elements based on your paths
     const dateEl = getElementByXpath('/html/body/div[3]/div/div[2]/div[1]/div/form/span/time');
     const headerEl = getElementByXpath('/html/body/div[3]/div/div[2]/div[2]/table/tfoot/tr');
-    const totalsEl = getElementByXpath('/html/body/div[3]/div/div[2]/div[2]/table/tbody/tr[16]');
+    
+    // UPDATED: Now uses your robust ID-based XPath for row 18
+    const totalsEl = getElementByXpath('//*[@id="diary-table"]/tbody/tr[18]');
 
     if (!totalsEl) {
-        console.error("❌ Totals row not found. Verify the row index or page layout.");
+        console.error("❌ Totals row not found at '//*[@id=\"diary-table\"]/tbody/tr[18]'.");
+        console.log("💡 Tip: If you have fewer/more meal slots today, the row index might change. Inspect the 'Totals' row to check its current index.");
         return;
     }
 
@@ -34,7 +37,7 @@ Instead of manually copying individual macro values or paying for premium export
         const percentages = clone.querySelectorAll('.macro-percentage');
         percentages.forEach(span => span.remove());
         
-        // Return the clean remaining text (e.g., "150g" instead of "150g 35%")
+        // Return the clean remaining text
         return clone.textContent.trim().replace(/\s+/g, ' ');
     };
     
@@ -42,8 +45,8 @@ Instead of manually copying individual macro values or paying for premium export
     const headers = headerEl ? Array.from(headerEl.cells).map(cell => cleanTextWithoutPercentages(cell)) : [];
     const totals = Array.from(totalsEl.cells).map(cell => cleanTextWithoutPercentages(cell));
 
-    // Construct CSV columns
-    const csvHeaders = ['Date', ...headers];
+    // Construct CSV columns (fallback to generic columns if headers fail to scrape)
+    const csvHeaders = ['Date', ...(headers.length > 0 ? headers : totals.map((_, i) => `Column_${i + 1}`))];
     const csvValues = [dateText, ...totals];
 
     // Helper to wrap fields in quotes if they contain commas
@@ -78,6 +81,6 @@ Instead of manually copying individual macro values or paying for premium export
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    console.log(`🚀 Success! Clean CSV generated (percentages removed) for date: ${dateText}`);
+    console.log(`🚀 Success! Clean CSV generated for date: ${dateText}`);
 })();
 ```
