@@ -8,21 +8,18 @@ Instead of manually copying individual macro values or paying for premium export
 
 ``` javascript
 (() => {
-    // Helper function to evaluate XPaths
-    const getElementByXpath = (path) => {
-        return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    };
-
-    // Grab elements based on your paths
-    const dateEl = getElementByXpath('/html/body/div[3]/div/div[2]/div[1]/div/form/span/time');
-    const headerEl = getElementByXpath('/html/body/div[3]/div/div[2]/div[2]/table/tfoot/tr');
+    // 1. Grab elements using robust CSS selectors
+    // Date: Target the <time> tag inside the form
+    const dateEl = document.querySelector('form span time');
     
-    // UPDATED: Now uses your robust ID-based XPath for row 18
-    const totalsEl = getElementByXpath('//*[@id="diary-table"]/tbody/tr[18]');
+    // Header: Target the first <tr> inside the <tfoot>
+    const headerEl = document.querySelector('tfoot tr');
+    
+    // Totals: Target the row with class "total"
+    const totalsEl = document.querySelector('tr.total');
 
     if (!totalsEl) {
-        console.error("❌ Totals row not found at '//*[@id=\"diary-table\"]/tbody/tr[18]'.");
-        console.log("💡 Tip: If you have fewer/more meal slots today, the row index might change. Inspect the 'Totals' row to check its current index.");
+        console.error("❌ Totals row (<tr class=\"total\">) not found on this page.");
         return;
     }
 
@@ -41,6 +38,7 @@ Instead of manually copying individual macro values or paying for premium export
         return clone.textContent.trim().replace(/\s+/g, ' ');
     };
     
+    // Process text values
     const dateText = cleanTextWithoutPercentages(dateEl) || new Date().toLocaleDateString().replace(/\//g, '-');
     const headers = headerEl ? Array.from(headerEl.cells).map(cell => cleanTextWithoutPercentages(cell)) : [];
     const totals = Array.from(totalsEl.cells).map(cell => cleanTextWithoutPercentages(cell));
